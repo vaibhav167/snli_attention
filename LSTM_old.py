@@ -82,11 +82,13 @@ class lstmModel:
         # checkpoint
         filepath="weights.best.hdf5"
         checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
-        callbacks_list = [checkpoint]
+        callbacks_list = [checkpoint, EarlyStopping(patience=4)]
         #self.model.load_weights(filepath)
-        self.model.fit_generator(self.getTrainGenerator(), steps_per_epoch = self.trainSize//batchSize, epochs = numEpochs, 
+        history = self.model.fit_generator(self.getTrainGenerator(), steps_per_epoch = self.trainSize//batchSize, epochs = numEpochs, 
             validation_data = self.getValGenerator(), validation_steps = (self.valSize)//batchSize, callbacks=callbacks_list)
         print("Training complete")
+        pickle.dump(history, open('history.pkl', 'wb'))
+
 
     def getTrainBatch(self, batchSize = 32):
         if self.trainCounter >= self.trainSize - 32 :
