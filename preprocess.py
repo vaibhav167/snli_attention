@@ -2,7 +2,7 @@ import jsonlines
 import numpy as np
 import cPickle as pickle
 import os
-
+from keras.preprocessing.text import text_to_word_sequence
 
 
 def getEmbedDict(gloveDir):
@@ -23,7 +23,7 @@ def loadEmbedDictFromPickle(filename = '../embeddings/embedDict.pkl'):
 	return pickle.load(open(filename, 'rb'))
 
 class Preprocessor:
-	def __init__(self, dataDir = '../snli_1.0/', embedDictFile = '../embeddings/embedDict.pkl', embedDim = 100):
+	def __init__(self, dataDir = '../snli_1.0/', embedDictFile = '../embeddings/embedDict_glove.42B.300d.pkl', embedDim = 300):
 		self.data = []
 		self.embedDict = {}
 		self.embedDim = embedDim
@@ -58,8 +58,8 @@ class Preprocessor:
 		for i in range(len(self.data)):
 			sample = self.data[i]
 			self.data[i] = {'gold_label': sample['gold_label'], 'sentence1': [], 'sentence2': []}
-			s1 = sample['sentence1'].lower().split()
-			s2 = sample['sentence2'].lower().split()
+			s1 = text_to_word_sequence(sample['sentence1'])
+			s2 = text_to_word_sequence(sample['sentence2'])
 			for word in s1:
 				self.data[i]['sentence1'].append(self.embedDict.get(word, np.zeros(self.embedDim)))
 			for word in s2:
@@ -84,6 +84,6 @@ class Preprocessor:
 # Embed data
 
 pp = Preprocessor()
-pp.getDataFromJSONL('../snli_1.0/snli_1.0_train.jsonl')
+pp.getDataFromJSONL('../snli_1.0/snli_1.0_dev.jsonl')
 pp.embedData()
 pp.saveDataAsPickle()
