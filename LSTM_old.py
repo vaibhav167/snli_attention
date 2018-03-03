@@ -87,7 +87,7 @@ class lstmModel:
         history = self.model.fit_generator(self.getTrainGenerator(), steps_per_epoch = self.trainSize//batchSize, epochs = numEpochs, 
             validation_data = self.getValGenerator(), validation_steps = (self.valSize)//batchSize, callbacks=callbacks_list)
         print("Training complete")
-        pickle.dump(history, open('history.pkl', 'wb'))
+        pickle.dump(history.history, open('history.pkl', 'wb'))
 
 
     def getTrainBatch(self, batchSize = 32):
